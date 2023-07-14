@@ -15,13 +15,7 @@ func AddData(coll *mongo.Collection, ctx context.Context, context *gin.Context, 
 	var book BookData
 	err := coll.FindOne(ctx, filter).Decode(&book)
 	if err != nil {
-		_, err := coll.InsertOne(ctx, bson.D{
-			{Key: "name", Value: newData.Name},
-			{Key: "author", Value: newData.Author},
-			{Key: "bookId", Value: newData.BookId},
-			{Key: "genre", Value: newData.Genre},
-			{Key: "quantity", Value: newData.Quantity},
-		})
+		_, err := coll.InsertOne(ctx, newData)
 		if err != nil {
 			context.IndentedJSON(http.StatusFailedDependency, gin.H{"Error": "Unable to insert Data due to wrong input"})
 			return
