@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"lib-mng-sys/views"
+	model "lib-mng-sys/models"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -37,37 +37,16 @@ func main() {
 	coll := client.Database("ABCLibrary").Collection("Books")
 	// AddData(coll, ctx)
 
-	// Check if the collection already exists
-	names, err := client.Database("ABCLibrary").ListCollectionNames(ctx, bson.M{"name": "Books"})
-	if err != nil {
-		fmt.Println("Failed to check collection existence:", err)
-		return
-	}
+	model.CreateColl(coll, client, ctx)
 
-	collectionExists := len(names) > 0
-	if !collectionExists {
-		// Create the collection
-		err = client.Database("ABCLibrary").CreateCollection(ctx, "Books")
-		if err != nil {
-			fmt.Println("Failed to create collection:", err)
-			return
-		}
+	router := gin.Default()
+	router.GET("/FindBooks", func(c *gin.Context) {
+		model.BooksAvailable(coll, ctx, c)
+	})
+	router.GET("/FindBooks/:genre", func(c *gin.Context) {
+		genre := c.Param("genre")
+		model.FilterByGenre(coll, ctx, c, genre)
+	})
 
-		// Create the indexes
-		indexes := []mongo.IndexModel{
-			{
-				Keys:    bson.D{{Key: "bookID", Value: 1}},
-				Options: options.Index().SetName("Idx").SetUnique(true),
-			},
-		}
-		_, err = coll.Indexes().CreateMany(ctx, indexes)
-		if err != nil {
-			fmt.Println("Failed to create indexes:", err)
-			return
-		}
-
-		fmt.Println("Collection created with indexes")
-	}
-
-	views.FlowControl(coll, ctx)
+	router.Run("localhost:9090")
 }
