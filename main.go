@@ -82,6 +82,18 @@ func main() {
 		}
 		model.AddData(coll, ctx, c, newData)
 	})
+	router.POST("/Admin/DeleteBook", func(c *gin.Context) {
+		var requestBody struct {
+			BookId int `json:"bookId" bson:"bookId"`
+		}
+
+		if err := c.ShouldBindJSON(&requestBody); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		model.DeleteBook(coll, ctx, c, requestBody.BookId)
+	})
 
 	router.Run("localhost:9090")
 }
