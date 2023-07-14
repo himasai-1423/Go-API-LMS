@@ -51,7 +51,7 @@ func main() {
 	})
 	router.POST("/TakeBook", func(c *gin.Context) {
 		var requestBody struct {
-			BookId int `json:"bookId"`
+			BookId int `json:"bookId" bson:"bookId"`
 		}
 
 		if err := c.ShouldBindJSON(&requestBody); err != nil {
@@ -60,6 +60,18 @@ func main() {
 		}
 
 		model.RentBook(coll, ctx, c, requestBody.BookId)
+	})
+	router.POST("/ReturnBook", func(c *gin.Context) {
+		var requestBody struct {
+			BookId int `json:"bookId" bson:"bookId"`
+		}
+
+		if err := c.ShouldBindJSON(&requestBody); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		model.ReturnBook(coll, ctx, c, requestBody.BookId)
 	})
 
 	router.Run("localhost:9090")

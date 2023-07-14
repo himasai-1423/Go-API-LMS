@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,7 @@ import (
 
 func RentBook(coll *mongo.Collection, ctx context.Context, context *gin.Context, reqBookId int) {
 	filter := bson.M{"bookId": reqBookId}
-	fmt.Println("In")
+
 	var book BookData
 	err := coll.FindOne(ctx, filter).Decode(&book)
 	if err != nil {
@@ -26,7 +25,7 @@ func RentBook(coll *mongo.Collection, ctx context.Context, context *gin.Context,
 
 		_, err := coll.UpdateOne(ctx, filter, update)
 		if err != nil {
-			context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update quantity"})
+			context.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to update quantity"})
 			return
 		}
 	} else {
