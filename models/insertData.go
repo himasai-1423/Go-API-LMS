@@ -2,52 +2,35 @@ package model
 
 import (
 	"context"
-	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func AddData(coll *mongo.Collection, ctx context.Context) {
-	insRes, err := coll.InsertOne(ctx, bson.D{
-		{Key: "name", Value: "A Song of Fire and Ice"},
-		{Key: "author", Value: "George R. R. Martin"},
-		{Key: "bookId", Value: 1},
-		{Key: "genre", Value: bson.A{"Fantasy", "Action", "Romance"}},
-		{Key: "quantity", Value: 3},
-	})
+func AddData(coll *mongo.Collection, ctx context.Context, context *gin.Context, newData BookData) {
+	filter := bson.M{"bookId": newData.BookId}
+
+	var book BookData
+	err := coll.FindOne(ctx, filter).Decode(&book)
 	if err != nil {
-		panic(err)
+		_, err := coll.InsertOne(ctx, bson.D{
+			{Key: "name", Value: newData.Name},
+			{Key: "author", Value: newData.Author},
+			{Key: "bookId", Value: newData.BookId},
+			{Key: "genre", Value: newData.Genre},
+			{Key: "quantity", Value: newData.Quantity},
+		})
+		if err != nil {
+			context.IndentedJSON(http.StatusFailedDependency, gin.H{"Error": "Unable to insert Data due to wrong input"})
+			return
+		}
+
+		context.IndentedJSON(http.StatusAccepted, newData)
+		return
+	} else {
+		context.IndentedJSON(http.StatusBadRequest, gin.H{"Error": "Book Id already exists"})
+		return
 	}
-
-	fmt.Println(insRes.InsertedID)
-
-	insertRes, err := coll.InsertMany(ctx, []interface{}{
-		bson.D{
-			{Key: "name", Value: "Attack On Titan"},
-			{Key: "author", Value: "Hajime Isayam"},
-			{Key: "bookId", Value: 3},
-			{Key: "genre", Value: bson.A{"Fantasy", "Action", "Adventure", "History"}},
-			{Key: "quantity", Value: 5},
-		},
-		bson.D{
-			{Key: "name", Value: "Harry Potter"},
-			{Key: "author", Value: "J.K. Rowling"},
-			{Key: "bookId", Value: 4},
-			{Key: "genre", Value: bson.A{"Fantasy", "Magic", "Adventure"}},
-			{Key: "quantity", Value: 12},
-		},
-		bson.D{
-			{Key: "name", Value: "Iron Man"},
-			{Key: "author", Value: "Stan Lee"},
-			{Key: "bookId", Value: 5},
-			{Key: "genre", Value: bson.A{"Sci-Fi", "Action"}},
-			{Key: "quantity", Value: 12},
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(insertRes.InsertedIDs)
 }

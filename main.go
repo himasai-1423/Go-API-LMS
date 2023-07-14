@@ -73,6 +73,15 @@ func main() {
 
 		model.ReturnBook(coll, ctx, c, requestBody.BookId)
 	})
+	router.POST("/Admin/AddBook", func(c *gin.Context) {
+		var newData model.BookData
+
+		if err := c.ShouldBindJSON(&newData); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+		model.AddData(coll, ctx, c, newData)
+	})
 
 	router.Run("localhost:9090")
 }
