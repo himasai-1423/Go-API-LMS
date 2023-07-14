@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	model "lib-mng-sys/models"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -40,12 +41,25 @@ func main() {
 	model.CreateColl(coll, client, ctx)
 
 	router := gin.Default()
+
 	router.GET("/FindBooks", func(c *gin.Context) {
 		model.BooksAvailable(coll, ctx, c)
 	})
 	router.GET("/FindBooks/:genre", func(c *gin.Context) {
 		genre := c.Param("genre")
 		model.FilterByGenre(coll, ctx, c, genre)
+	})
+	router.POST("/TakeBook", func(c *gin.Context) {
+		var requestBody struct {
+			BookId int `json:"bookId"`
+		}
+
+		if err := c.ShouldBindJSON(&requestBody); err != nil {
+			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
+		}
+
+		model.RentBook(coll, ctx, c, requestBody.BookId)
 	})
 
 	router.Run("localhost:9090")
