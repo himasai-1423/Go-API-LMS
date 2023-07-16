@@ -27,13 +27,11 @@ func CreateColl(coll *mongo.Collection, client *mongo.Client, ctx context.Contex
 		}
 
 		// Create the indexes
-		indexes := []mongo.IndexModel{
-			{
-				Keys:    bson.D{{Key: "bookID", Value: 1}},
-				Options: options.Index().SetName("Idx").SetUnique(true),
-			},
+		indexes := mongo.IndexModel{
+			Keys:    bson.D{{Key: "bookId", Value: 1}},
+			Options: options.Index().SetName("Idx").SetUnique(true),
 		}
-		_, err = coll.Indexes().CreateMany(ctx, indexes)
+		_, err = coll.Indexes().CreateOne(ctx, indexes)
 		if err != nil {
 			fmt.Println("Failed to create indexes:", err)
 			return

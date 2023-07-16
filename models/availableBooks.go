@@ -10,9 +10,9 @@ import (
 )
 
 type BookData struct {
+	BookId   int32    `json:"bookId" bson:"bookId"`
 	Name     string   `json:"name" bson:"name"`
 	Author   string   `json:"author" bson:"author"`
-	BookId   int32    `json:"bookId" bson:"bookId"`
 	Genre    []string `json:"genre" bson:"genre"`
 	Quantity int32    `json:"quantity" bson:"quantity"`
 }

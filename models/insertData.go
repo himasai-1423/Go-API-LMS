@@ -9,22 +9,24 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func AddData(coll *mongo.Collection, ctx context.Context, context *gin.Context, newData BookData) {
+func AddData(coll *mongo.Collection, ctx context.Context, c *gin.Context, newData BookData) {
 	filter := bson.M{"bookId": newData.BookId}
-
-	var book BookData
-	err := coll.FindOne(ctx, filter).Decode(&book)
+	count, err := coll.CountDocuments(ctx, filter)
 	if err != nil {
-		_, err := coll.InsertOne(ctx, newData)
-		if err != nil {
-			context.IndentedJSON(http.StatusFailedDependency, gin.H{"Error": "Unable to insert Data due to wrong input"})
-			return
-		}
-
-		context.IndentedJSON(http.StatusAccepted, newData)
-		return
-	} else {
-		context.IndentedJSON(http.StatusBadRequest, gin.H{"Error": "Book Id already exists"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to check document existence"})
 		return
 	}
+
+	if count > 0 {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Book ID already exists"})
+		return
+	}
+
+	_, err = coll.InsertOne(ctx, newData)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert data"})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, newData)
 }

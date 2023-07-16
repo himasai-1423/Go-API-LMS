@@ -9,7 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DeleteBook(coll *mongo.Collection, ctx context.Context, context *gin.Context, reqBookId int) {
+func DeleteBook(coll *mongo.Collection, ctx context.Context, context *gin.Context, reqBookId int32) {
 	filter := bson.M{"bookId": reqBookId}
 
 	var book BookData

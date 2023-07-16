@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var DB_URI string = "mongodb+srv://borahimasaireddy:himu2003@cluster0.daxzqzv.mongodb.net/?retryWrites=true&w=majority"
+var DB_URI string = "mongodb://localhost:27017"
 
 func main() {
 	// # Establishing connection
@@ -84,7 +84,7 @@ func main() {
 	})
 	router.POST("/Admin/DeleteBook", func(c *gin.Context) {
 		var requestBody struct {
-			BookId int `json:"bookId" bson:"bookId"`
+			BookId int32 `json:"bookId" bson:"bookId"`
 		}
 
 		if err := c.ShouldBindJSON(&requestBody); err != nil {
