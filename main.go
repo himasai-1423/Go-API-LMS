@@ -12,7 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var DB_URI string = "mongodb://localhost:27017"
+var DB_URI string = "mongodb://root:example@mongodb:27017"
+
+// var DB_URI string = "mongodb://localhost:27017"
+// var DB_URI string = "mongodb+srv://borahimasaireddy:himu2003@cluster0.daxzqzv.mongodb.net/?retryWrites=true&w=majority"
 
 func main() {
 	// # Establishing connection
@@ -43,6 +46,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/FindBooks", func(c *gin.Context) {
+		c.Header("Content-Type", "application/vnd.api+json")
 		model.BooksAvailable(coll, ctx, c)
 	})
 	router.GET("/FindBooks/:genre", func(c *gin.Context) {

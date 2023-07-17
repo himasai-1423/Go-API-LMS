@@ -1,9 +1,11 @@
-FROM golang:1.21rc2-bookworm
+FROM golang:1.21rc2-alpine3.17
 
 WORKDIR /app/
 
 COPY . /app/
 
-RUN go get 
+RUN go get .
 
-CMD [ "./" ]
+RUN go build -o myapp
+
+CMD ["./myapp"]

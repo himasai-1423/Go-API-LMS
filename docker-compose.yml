@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  mongodb:
+    image: mongo:7.0-rc
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    networks:
+      - mynetwork
+  
+  api-lib-front:
+    image: api-lib-front:1.0
+    ports:
+      - 9090:9090
+    depends_on:
+      - mongodb
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+
