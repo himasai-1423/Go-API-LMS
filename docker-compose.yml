@@ -1,5 +1,13 @@
 version: "3.9"
 services:
+  api-lib-front:
+    image: api-lib-front:1.0
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+    networks:
+      - mynetwork
   mongodb:
     image: mongo:7.0-rc
     ports:
@@ -10,14 +18,7 @@ services:
     networks:
       - mynetwork
   
-  api-lib-front:
-    image: api-lib-front:1.0
-    ports:
-      - 9090:9090
-    depends_on:
-      - mongodb
-    networks:
-      - mynetwork
+  
 
 networks:
   mynetwork:

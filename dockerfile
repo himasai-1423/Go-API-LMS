@@ -8,4 +8,6 @@ RUN go get .
 
 RUN go build -o myapp
 
+EXPOSE 3000
+
 CMD ["./myapp"]

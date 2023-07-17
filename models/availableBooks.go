@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,7 @@ type BookData struct {
 }
 
 func BooksAvailable(coll *mongo.Collection, ctx context.Context, context *gin.Context) {
+	fmt.Println("Inside BooksAvailable()")
 	cursor, err := coll.Find(ctx, bson.M{})
 
 	if err != nil {
