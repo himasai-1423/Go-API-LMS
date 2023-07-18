@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"lib-mng-sys/controllers"
 	model "lib-mng-sys/models"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +15,6 @@ import (
 var DB_URI string = "mongodb://root:example@mongodb:27017"
 
 // var DB_URI string = "mongodb://localhost:27017"
-
 // var DB_URI string = "mongodb+srv://borahimasaireddy:himu2003@cluster0.daxzqzv.mongodb.net/?retryWrites=true&w=majority"
 
 func main() {
@@ -46,59 +45,7 @@ func main() {
 
 	router := gin.Default()
 
-	router.GET("/FindBooks", func(c *gin.Context) {
-		fmt.Println("Inside get")
-		model.BooksAvailable(coll, ctx, c)
-	})
-	router.GET("/FindBooks/:genre", func(c *gin.Context) {
-		genre := c.Param("genre")
-		model.FilterByGenre(coll, ctx, c, genre)
-	})
-	router.POST("/TakeBook", func(c *gin.Context) {
-		var requestBody struct {
-			BookId int `json:"bookId" bson:"bookId"`
-		}
-
-		if err := c.ShouldBindJSON(&requestBody); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-
-		model.RentBook(coll, ctx, c, requestBody.BookId)
-	})
-	router.POST("/ReturnBook", func(c *gin.Context) {
-		var requestBody struct {
-			BookId int `json:"bookId" bson:"bookId"`
-		}
-
-		if err := c.ShouldBindJSON(&requestBody); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-
-		model.ReturnBook(coll, ctx, c, requestBody.BookId)
-	})
-	router.POST("/Admin/AddBook", func(c *gin.Context) {
-		var newData model.BookData
-
-		if err := c.ShouldBindJSON(&newData); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-		model.AddData(coll, ctx, c, newData)
-	})
-	router.POST("/Admin/DeleteBook", func(c *gin.Context) {
-		var requestBody struct {
-			BookId int32 `json:"bookId" bson:"bookId"`
-		}
-
-		if err := c.ShouldBindJSON(&requestBody); err != nil {
-			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-			return
-		}
-
-		model.DeleteBook(coll, ctx, c, requestBody.BookId)
-	})
+	controllers.HttpCallRoutes(coll, ctx, router)
 
 	router.Run("0.0.0.0:3000")
 }
