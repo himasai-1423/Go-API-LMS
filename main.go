@@ -19,33 +19,27 @@ var DB_URI string = "mongodb://root:example@mongodb:27017"
 
 func main() {
 	// # Establishing connection
+	fmt.Println("Starting Connection")
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(DB_URI))
 	ctx := context.TODO()
-
 	if err != nil {
 		panic(err)
 	}
-
 	defer func() {
 		if err := client.Disconnect(ctx); err != nil {
 			panic(err)
 		}
 	}()
-
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		panic(err)
 	}
 	fmt.Println("Connection sucessfully established!")
 
-	// # Adding data
 	coll := client.Database("ABCLibrary").Collection("Books")
-	// AddData(coll, ctx)
-
 	model.CreateColl(coll, client, ctx)
 
 	router := gin.Default()
 
 	controllers.HttpCallRoutes(coll, ctx, router)
-
 	router.Run("0.0.0.0:3000")
 }
